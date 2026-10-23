@@ -15,13 +15,16 @@ function Todos() {
     setText('')
   }
 
-  // Handle checking/unchecking a todo
   function handleToggle(id) {
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     )
+  }
+
+  function handleDelete(id) {
+    setTodos(todos.filter((todo) => todo.id !== id))
   }
 
   return (
@@ -63,6 +66,13 @@ function Todos() {
                   >
                     {todo.text}
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(todo.id)}
+                    className="absolute right-[10px] hidden size-10 cursor-pointer text-[30px] text-[#949494] group-hover:block hover:text-[#c18585]"
+                  >
+                    ×
+                  </button>
                 </li>
               ))}
             </ul>
