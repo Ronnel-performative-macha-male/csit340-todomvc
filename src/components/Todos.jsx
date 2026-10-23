@@ -27,6 +27,12 @@ function Todos() {
     setTodos(todos.filter((todo) => todo.id !== id))
   }
 
+  function handleClearCompleted() {
+    setTodos(todos.filter((todo) => !todo.completed))
+  }
+
+  const itemsLeft = todos.filter((todo) => !todo.completed).length
+
   return (
     <section className="mx-auto max-w-[550px]">
       <h1 className="text-center text-[80px] font-extralight text-[#b83f45]">
@@ -88,7 +94,7 @@ function Todos() {
 
             <footer className="relative flex h-10 items-center justify-between border-t border-[#ededed] px-[15px] text-sm text-[#777] shadow-[0_1px_1px_rgba(0,0,0,0.08),0_8px_0_-3px_#f6f6f6,0_9px_1px_-3px_rgba(0,0,0,0.08),0_16px_0_-6px_#f6f6f6,0_17px_2px_-6px_rgba(0,0,0,0.08)]">
               <span>
-                <strong>0</strong> items left
+                <strong>{itemsLeft}</strong> items left
               </span>
               <ul className="flex gap-[3px]">
                 <li>
@@ -118,6 +124,7 @@ function Todos() {
               </ul>
               <button
                 type="button"
+                onClick={handleClearCompleted}
                 className="cursor-pointer hover:underline"
               >
                 Clear completed
