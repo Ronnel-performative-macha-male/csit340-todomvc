@@ -1,26 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 function Todos() {
   const [text, setText] = useState('')
   const [todos, setTodos] = useState([])
   const [filter, setFilter] = useState('all')
-
-  useEffect(() => {
-    function handleHashChange() {
-      const hash = window.location.hash
-      if (hash === '#/active') {
-        setFilter('active')
-      } else if (hash === '#/completed') {
-        setFilter('completed')
-      } else {
-        setFilter('all')
-      }
-    }
-
-    handleHashChange()
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [])
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -49,7 +32,14 @@ function Todos() {
     setTodos(todos.filter((todo) => !todo.completed))
   }
 
+  function handleToggleAll() {
+    const allCompleted = todos.every((todo) => todo.completed)
+    setTodos(todos.map((todo) => ({ ...todo, completed: !allCompleted })))
+  }
+
   const itemsLeft = todos.filter((todo) => !todo.completed).length
+  const allCompleted = todos.length > 0 && todos.every((todo) => todo.completed)
+  const hasCompleted = todos.some((todo) => todo.completed)
 
   const filteredTodos = todos.filter((todo) => {
     if (filter === 'active') return !todo.completed
@@ -76,7 +66,21 @@ function Todos() {
         {todos.length > 0 && (
           <>
             <main className="relative border-t border-[#e6e6e6]">
-              <ul className="overflow-hidden">
+              <input
+                id="toggle-all"
+                type="checkbox"
+                checked={allCompleted}
+                onChange={handleToggleAll}
+                className="peer sr-only"
+              />
+              <label
+                htmlFor="toggle-all"
+                className="absolute -top-[66px] left-0 flex h-[65px] w-[60px] cursor-pointer items-center justify-center text-[22px] text-[#949494] peer-checked:text-[#484848]"
+              >
+                <span className="rotate-90">❯</span>
+              </label>
+
+              <ul>
                 {filteredTodos.map((todo) => (
                   <li
                     key={todo.id}
@@ -109,43 +113,60 @@ function Todos() {
               </ul>
             </main>
 
-            <footer className="relative flex h-10 items-center justify-between border-t border-[#ededed] px-[15px] text-sm text-[#777] shadow-[0_1px_1px_rgba(0,0,0,0.08),0_8px_0_-3px_#f6f6f6,0_9px_1px_-3px_rgba(0,0,0,0.08),0_16px_0_-6px_#f6f6f6,0_17px_2px_-6px_rgba(0,0,0,0.08)]">
+            <footer className="grid h-10 grid-cols-3 items-center border-t border-[#e6e6e6] px-[15px] text-[15px]">
               <span>
-                <strong>{itemsLeft}</strong> items left
+                <strong className="font-light">{itemsLeft}</strong> item{itemsLeft === 1 ? '' : 's'} left
               </span>
-              <ul className="flex gap-[3px]">
+              <ul className="flex justify-center gap-1">
                 <li>
-                  <a
-                    href="#/"
-                    className={`rounded border px-[7px] py-[3px] ${filter === 'all' ? 'border-[#b83f45]/40' : 'border-transparent hover:border-[#b83f45]/20'}`}
+                  <button
+                    type="button"
+                    onClick={() => setFilter('all')}
+                    className={
+                      filter === 'all'
+                        ? 'cursor-pointer rounded-[3px] border border-[#b83f45]/20 px-[7px] py-[3px]'
+                        : 'cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10'
+                    }
                   >
                     All
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="#/active"
-                    className={`rounded border px-[7px] py-[3px] ${filter === 'active' ? 'border-[#b83f45]/40' : 'border-transparent hover:border-[#b83f45]/20'}`}
+                  <button
+                    type="button"
+                    onClick={() => setFilter('active')}
+                    className={
+                      filter === 'active'
+                        ? 'cursor-pointer rounded-[3px] border border-[#b83f45]/20 px-[7px] py-[3px]'
+                        : 'cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10'
+                    }
                   >
                     Active
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="#/completed"
-                    className={`rounded border px-[7px] py-[3px] ${filter === 'completed' ? 'border-[#b83f45]/40' : 'border-transparent hover:border-[#b83f45]/20'}`}
+                  <button
+                    type="button"
+                    onClick={() => setFilter('completed')}
+                    className={
+                      filter === 'completed'
+                        ? 'cursor-pointer rounded-[3px] border border-[#b83f45]/20 px-[7px] py-[3px]'
+                        : 'cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10'
+                    }
                   >
                     Completed
-                  </a>
+                  </button>
                 </li>
               </ul>
-              <button
-                type="button"
-                onClick={handleClearCompleted}
-                className="cursor-pointer hover:underline"
-              >
-                Clear completed
-              </button>
+              {hasCompleted && (
+                <button
+                  type="button"
+                  onClick={handleClearCompleted}
+                  className="cursor-pointer justify-self-end hover:underline"
+                >
+                  Clear completed
+                </button>
+              )}
             </footer>
           </>
         )}
