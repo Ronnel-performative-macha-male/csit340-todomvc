@@ -127,7 +127,7 @@ function Todos() {
                 onClick={handleClearCompleted}
                 className="cursor-pointer hover:underline"
               >
-                Clear completed
+                Clear completedd
               </button>
             </footer>
           </>
