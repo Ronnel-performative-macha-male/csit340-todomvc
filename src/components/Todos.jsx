@@ -1,8 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function Todos() {
   const [text, setText] = useState('')
   const [todos, setTodos] = useState([])
+  const [filter, setFilter] = useState('all')
+
+  useEffect(() => {
+    function handleHashChange() {
+      const hash = window.location.hash
+      if (hash === '#/active') {
+        setFilter('active')
+      } else if (hash === '#/completed') {
+        setFilter('completed')
+      } else {
+        setFilter('all')
+      }
+    }
+
+    handleHashChange()
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -31,13 +49,13 @@ function Todos() {
     setTodos(todos.filter((todo) => !todo.completed))
   }
 
-  function handleToggleAll() {
-    const allCompleted = todos.every((todo) => todo.completed)
-    setTodos(todos.map((todo) => ({ ...todo, completed: !allCompleted })))
-  }
-
   const itemsLeft = todos.filter((todo) => !todo.completed).length
-  const allCompleted = todos.length > 0 && todos.every((todo) => todo.completed)
+
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === 'active') return !todo.completed
+    if (filter === 'completed') return todo.completed
+    return true
+  })
 
   return (
     <section className="mx-auto max-w-[550px]">
@@ -58,21 +76,8 @@ function Todos() {
         {todos.length > 0 && (
           <>
             <main className="relative border-t border-[#e6e6e6]">
-              <input
-                id="toggle-all"
-                type="checkbox"
-                checked={allCompleted}
-                onChange={handleToggleAll}
-                className="peer sr-only"
-              />
-              <label
-                htmlFor="toggle-all"
-                className="absolute top-[18px] left-[15px] size-[30px] rotate-90 cursor-pointer text-center text-2xl text-[#949494] select-none before:content-['❯'] peer-checked:text-[#484848]"
-              >
-                Mark all as complete
-              </label>
               <ul className="overflow-hidden">
-                {todos.map((todo) => (
+                {filteredTodos.map((todo) => (
                   <li
                     key={todo.id}
                     className="group relative flex items-center border-b border-[#ededed] text-2xl"
@@ -112,7 +117,7 @@ function Todos() {
                 <li>
                   <a
                     href="#/"
-                    className="rounded border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/20"
+                    className={`rounded border px-[7px] py-[3px] ${filter === 'all' ? 'border-[#b83f45]/40' : 'border-transparent hover:border-[#b83f45]/20'}`}
                   >
                     All
                   </a>
@@ -120,7 +125,7 @@ function Todos() {
                 <li>
                   <a
                     href="#/active"
-                    className="rounded border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/20"
+                    className={`rounded border px-[7px] py-[3px] ${filter === 'active' ? 'border-[#b83f45]/40' : 'border-transparent hover:border-[#b83f45]/20'}`}
                   >
                     Active
                   </a>
@@ -128,7 +133,7 @@ function Todos() {
                 <li>
                   <a
                     href="#/completed"
-                    className="rounded border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/20"
+                    className={`rounded border px-[7px] py-[3px] ${filter === 'completed' ? 'border-[#b83f45]/40' : 'border-transparent hover:border-[#b83f45]/20'}`}
                   >
                     Completed
                   </a>
