@@ -31,7 +31,13 @@ function Todos() {
     setTodos(todos.filter((todo) => !todo.completed))
   }
 
+  function handleToggleAll() {
+    const allCompleted = todos.every((todo) => todo.completed)
+    setTodos(todos.map((todo) => ({ ...todo, completed: !allCompleted })))
+  }
+
   const itemsLeft = todos.filter((todo) => !todo.completed).length
+  const allCompleted = todos.length > 0 && todos.every((todo) => todo.completed)
 
   return (
     <section className="mx-auto max-w-[550px]">
@@ -52,7 +58,13 @@ function Todos() {
         {todos.length > 0 && (
           <>
             <main className="relative border-t border-[#e6e6e6]">
-              <input id="toggle-all" type="checkbox" className="peer sr-only" />
+              <input
+                id="toggle-all"
+                type="checkbox"
+                checked={allCompleted}
+                onChange={handleToggleAll}
+                className="peer sr-only"
+              />
               <label
                 htmlFor="toggle-all"
                 className="absolute top-[18px] left-[15px] size-[30px] rotate-90 cursor-pointer text-center text-2xl text-[#949494] select-none before:content-['❯'] peer-checked:text-[#484848]"
@@ -127,7 +139,7 @@ function Todos() {
                 onClick={handleClearCompleted}
                 className="cursor-pointer hover:underline"
               >
-                Clear completedd
+                Clear completed
               </button>
             </footer>
           </>
